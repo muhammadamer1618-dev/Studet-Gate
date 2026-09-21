@@ -808,63 +808,83 @@ button.system-link{
 @media(max-width:600px){
 
   .logo{
-    width:82px;
-    height:82px;
+    width:72px;
+    height:72px;
   }
 
   .main-title{
-    font-size:34px;
+    font-size:28px;
+    line-height:1.2;
   }
 
   .english-title{
-    font-size:15px;
+    font-size:13px;
   }
 
   .portal-grid{
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+    width:min(430px,94vw);
+    margin:14px auto;
   }
 
   .portal-card{
-    min-height:165px;
-    border-radius:21px;
+    min-height:128px;
+    border-radius:17px;
+    padding:12px 8px;
   }
 
   .card-icon{
-    width:66px;
-    height:66px;
-    font-size:28px;
-    border-width:3px;
-    margin-bottom:10px;
+    width:48px;
+    height:48px;
+    font-size:22px;
+    border-width:2px;
+    margin-bottom:7px;
   }
 
   .portal-card h2{
-    font-size:20px;
+    font-size:16px;
+    line-height:1.25;
+  }
+
+  .portal-card p{
+    font-size:11px;
+    line-height:1.3;
   }
 
   .portal-card:hover{
-    transform:
-    translateY(-4px)
-    scale(1.035);
+    transform:translateY(-2px);
   }
 
   .portal-card:hover .card-icon{
-    transform:scale(1.08);
+    transform:scale(1.04);
   }
 
   .leadership{
     grid-template-columns:1fr;
-    gap:10px;
+    gap:8px;
   }
 
   .leader{
-    padding:9px 12px;
+    padding:8px 10px;
   }
 
   .credit{
     font-size:15px;
   }
 
+}
+
+@media(max-width:380px){
+  .page{padding:10px 10px 18px;}
+  .logo{width:62px;height:62px;}
+  .main-title{font-size:24px;}
+  .english-title{font-size:12px;}
+  .portal-grid{gap:7px;width:96vw;}
+  .portal-card{min-height:116px;padding:9px 6px;border-radius:15px;}
+  .card-icon{width:42px;height:42px;font-size:19px;margin-bottom:5px;}
+  .portal-card h2{font-size:14px;}
+  .portal-card p{font-size:10px;}
 }
 
 </style>
@@ -1037,7 +1057,7 @@ AlFalah Student Gate
 const studentLinks = {
   exams:"https://muhammadamer1618-dev.github.io/Rased-System/exams.html",
   results:"https://muhammadamer1618-dev.github.io/rasededu/student.html",
-  plan:"https://muhammadamer1618-dev.github.io/rasededu/weekly.html",
+  plan:"https://muhammadamer1618-dev.github.io/Weekly-Plan/student.html",
   examSchedule:"https://muhammadamer1618-dev.github.io/rasededu/exam-schedule.html"
 };
 
