@@ -55,6 +55,7 @@ header{background:linear-gradient(135deg,#003f35,#08725e);color:#fff;padding:17p
     لا يتم حفظ نتيجتك أو عدد مرات اللعب.
   </div>
   <div id="list" class="grid"><div class="empty">جاري تحميل الأنشطة المتاحة...</div></div>
+  <div style="text-align:center;color:#6b7d75;font-size:12px;font-weight:bold;padding:12px 0 0">تصميم محمد عامر أحمد</div>
 </div>
 
 <script>
@@ -78,7 +79,7 @@ function norm(v){
 function sameClass(c,s){
   return norm(c&&c.grade)===norm(s.grade)&&norm(c&&c.section)===norm(s.section);
 }
-function templateName(v){return {quiz:"تحدي الأسئلة",cards:"بطاقات سؤال وجواب",wheel:"عجلة الأسئلة",random:"أسئلة عشوائية"}[v]||"نشاط تفاعلي"}
+function templateName(v){return {quiz:"تحدي الأسئلة",cards:"بطاقات تفاعلية",wheel:"عجلة الأسئلة",boxes:"صناديق المفاجآت",stars:"نجوم الحظ",random:"أسئلة عشوائية"}[v]||"نشاط تفاعلي"}
 function playUrl(a){
   return "https://rasededu.online/rased/interactive-play.html?c="+encodeURIComponent(a.publicCode||a.id||"");
 }
