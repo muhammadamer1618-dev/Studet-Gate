@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الأنشطة التفاعلية - بوابة الطالب</title>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<style>
+:root{--green:#004c3f;--green2:#08725e;--gold:#c9972c;--ink:#17372f;--muted:#6b7d75;--line:#d7e2dd}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tajawal,Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#f8f2e5,#fff 48%,#edf7f3);color:var(--ink);min-height:100vh}
+button{font:inherit}
+header{background:linear-gradient(135deg,#003f35,#08725e);color:#fff;padding:17px 15px;box-shadow:0 3px 12px rgba(0,0,0,.16)}
+.head{width:min(1100px,94%);margin:auto;display:flex;align-items:center;gap:13px}
+.logo{width:62px;height:62px;border-radius:50%;object-fit:contain;background:#fff;border:3px solid var(--gold);padding:3px}
+.copy{flex:1}.copy h1{margin:0;font-size:25px}.copy p{margin:5px 0 0;color:#f1da8e;font-size:12px;font-weight:bold}
+.back{border:0;background:#fff;color:var(--green);border-radius:9px;padding:9px 12px;font-weight:900;cursor:pointer}
+.wrap{width:min(1100px,94%);margin:18px auto 40px}
+.welcome{background:#fffaf0;border:1px solid #e0c978;border-radius:14px;padding:14px 16px;line-height:1.8;text-align:center;margin-bottom:15px}
+.welcome b{color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.activity{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.06);padding:16px;display:flex;flex-direction:column;min-height:220px}
+.icon{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#0a715e,#004c3f);color:#fff;border:3px solid var(--gold);font-size:26px;margin-bottom:10px}
+.activity h2{margin:0 0 7px;color:var(--green);font-size:19px}
+.meta{font-size:12px;color:var(--muted);line-height:1.8;flex:1}
+.play{width:100%;border:0;border-radius:10px;background:var(--green);color:#fff;padding:11px 14px;font-weight:900;cursor:pointer;margin-top:12px}
+.play:hover{filter:brightness(1.05)}
+.tag{display:inline-block;background:#eef5f2;color:#49675d;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:bold;margin-top:7px}
+.empty{background:#fff;border:1px dashed #bccdc6;border-radius:14px;padding:36px;text-align:center;color:#71857c;grid-column:1/-1;line-height:1.8}
+.loading{text-align:center;padding:30px;color:#657a71}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.copy h1{font-size:20px}.logo{width:52px;height:52px}.activity{min-height:190px}.back{padding:8px;font-size:11px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <img src="logo.jpeg" class="logo" alt="شعار مدارس الفلاح">
+    <div class="copy">
+      <h1>🎮 الأنشطة التفاعلية</h1>
+      <p>تعلم · جرّب · العب وقتما تحب</p>
+    </div>
+    <button class="back" onclick="location.href='index.html'">← بوابة الطالب</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="welcome">
+    <b id="studentHello">مرحبًا 👋</b><br>
+    الأنشطة الموجودة هنا <b>اختيارية</b> للتدريب والمتعة وليست فرضًا أو واجبًا.
+    لا يتم حفظ نتيجتك أو عدد مرات اللعب.
+  </div>
+  <div id="list" class="grid"><div class="empty">جاري تحميل الأنشطة المتاحة...</div></div>
+</div>
+
+<script>
+const firebaseConfig={
+  apiKey:"AIzaSyAfgSV-6_IMkXncgPWxY69omKfvFtGakgk",
+  authDomain:"results2026-7c0dd.firebaseapp.com",
+  projectId:"results2026-7c0dd",
+  storageBucket:"results2026-7c0dd.firebasestorage.app",
+  messagingSenderId:"241421115694",
+  appId:"1:241421115694:web:96f55fd9fd1d5b18b31abf"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function norm(v){
+  return String(v||"").trim().toLowerCase()
+    .replace(/[أإآ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه")
+    .replace(/[\u064B-\u065F\u0670]/g,"").replace(/\s+/g," ");
+}
+function sameClass(c,s){
+  return norm(c&&c.grade)===norm(s.grade)&&norm(c&&c.section)===norm(s.section);
+}
+function templateName(v){return {quiz:"تحدي الأسئلة",cards:"بطاقات سؤال وجواب",wheel:"عجلة الأسئلة",random:"أسئلة عشوائية"}[v]||"نشاط تفاعلي"}
+function playUrl(a){
+  return "https://rasededu.online/rased/interactive-play.html?c="+encodeURIComponent(a.publicCode||a.id||"");
+}
+function openActivity(id){
+  const a=window.activityRows&&window.activityRows.find(function(x){return x.id===id});
+  if(a)window.location.href=playUrl(a);
+}
+async function boot(){
+  let session=null;
+  if(window.RasedStudentSSO&&window.RasedStudentSSO.getSession){
+    session=window.RasedStudentSSO.getSession();
+  }
+  if(!session){
+    location.href="index.html";
+    return;
+  }
+  document.getElementById("studentHello").textContent="مرحبًا "+(session.name||"بك")+" 👋";
+  try{
+    const snap=await db.collection("interactiveActivities").get();
+    const all=snap.docs.map(function(d){return Object.assign({id:d.id},d.data()||{})});
+    const rows=all.filter(function(a){
+      if(a.published!==true)return false;
+      const cls=Array.isArray(a.classes)?a.classes:[];
+      return cls.some(function(c){return sameClass(c,session)});
+    });
+    rows.sort(function(a,b){
+      const aa=a.publishedAt&&a.publishedAt.toMillis?a.publishedAt.toMillis():0;
+      const bb=b.publishedAt&&b.publishedAt.toMillis?b.publishedAt.toMillis():0;
+      return bb-aa;
+    });
+    window.activityRows=rows;
+    render(rows);
+  }catch(e){
+    console.error(e);
+    document.getElementById("list").innerHTML='<div class="empty">تعذر تحميل الأنشطة الآن. حاول مرة أخرى لاحقًا.</div>';
+  }
+}
+function render(rows){
+  const box=document.getElementById("list");
+  if(!rows.length){
+    box.innerHTML='<div class="empty">🎈 لا توجد أنشطة تفاعلية منشورة لفصلك حاليًا.<br>ارجع في أي وقت عندما يضيف معلمك نشاطًا جديدًا.</div>';
+    return;
+  }
+  box.innerHTML=rows.map(function(a){
+    return '<article class="activity">'+
+      '<div class="icon">🎮</div>'+
+      '<h2>'+esc(a.title||"نشاط تفاعلي")+'</h2>'+
+      '<div class="meta">'+esc(a.subjectName||"نشاط تعليمي")+
+      (a.teacherName?'<br>المعلم: '+esc(a.teacherName):'')+
+      '<br><span class="tag">'+esc(templateName(a.template))+'</span>'+
+      '<br><span class="tag">'+(Array.isArray(a.items)?a.items.length:0)+' سؤال / مهمة</span></div>'+
+      '<button class="play" onclick="openActivity(\''+esc(a.id)+'\')">▶️ ابدأ اللعب</button>'+
+    '</article>';
+  }).join("");
+}
+</script>
+<script src="rased-student-sso.js?v=20261013-1"></script>
+<script>
+setTimeout(boot,0);
+</script>
+</body>
+</html>
