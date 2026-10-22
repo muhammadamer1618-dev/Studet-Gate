@@ -78,7 +78,7 @@ async function loadParentActivities(code){
   const list=snap.docs.map(x=>({id:x.id,...x.data()})).filter(x=>norm(x.grade)===norm(grade)&&norm(x.section)===norm(section));
   $("parentActivities").classList.remove("hidden");
   $("parentStudentLabel").textContent="الطالب: "+(studentData.name||session?.name||"")+" — "+grade+" / "+section;
-  $("parentActivityList").innerHTML=list.length?list.map(x=>'<div class="activity"><strong>'+esc(x.title)+'</strong><div class="muted">'+esc(x.subjectName||"اللغة الإنجليزية")+' · '+(x.items||[]).length+' كلمة وجملة</div><button onclick="startActivityById('+JSON.stringify(x.id)+')">ابدأ النشاط</button></div>').join(""):"لا توجد أنشطة منشورة لهذا الصف والشعبة حتى الآن.";
+  $("parentActivityList").innerHTML=list.length?list.map(x=>'<div class="activity"><strong>'+esc(x.title)+'</strong><div class="muted">'+esc(x.subjectName||"اللغة الإنجليزية")+' · '+(x.items||[]).length+' كلمة وجملة</div><button type="button" class="start-english-activity" data-activity-id="'+esc(x.id)+'">ابدأ النشاط</button></div>').join(""):"لا توجد أنشطة منشورة لهذا الصف والشعبة حتى الآن.";
   $("learner").classList.add("hidden");
   status("");
  }catch(e){$("learner").classList.add("hidden");status("تعذر عرض الأنشطة: "+e.message,true)}
@@ -86,6 +86,12 @@ async function loadParentActivities(code){
 function getStudentSession(){try{const x=JSON.parse(localStorage.getItem("rased.student.session.v1")||"null");return x&&(!x.expiresAt||Number(x.expiresAt)>Date.now())?x:null}catch{return null}}
 
 function getStudentSessionCode(){try{const x=JSON.parse(localStorage.getItem("rased.student.session.v1")||"null");return x&&(!x.expiresAt||Number(x.expiresAt)>Date.now())?String(x.code||""):""}catch{return ""}}
+document.addEventListener("click",function(event){
+ const button=event.target.closest(".start-english-activity");
+ if(!button)return;
+ event.preventDefault();
+ startActivityById(button.dataset.activityId);
+});
 function startActivityById(id){$("activityCode").value=id;$("learner").classList.remove("hidden");openActivity()}
 function clearForm(){editing=null;$("title").value="";$("items").value=""}
 async function loadActivities(){const snap=await db.collection("englishActivities").where("teacherId","==",username()).get();activities=snap.docs.map(d=>({id:d.id,...d.data()}));$("myActivities").innerHTML=activities.length?activities.map(a=>'<div class="activity"><strong>'+esc(a.title)+'</strong><div class="muted">'+esc(a.grade+' / '+a.section)+' · '+(a.items||[]).length+' بند</div><button onclick="editActivity('+JSON.stringify(a.id).replace(/"/g,"&quot;")+')">تعديل</button><button class="secondary" onclick="copyLink('+JSON.stringify(a.id).replace(/"/g,"&quot;")+')">نسخ الرابط</button><button class="secondary" onclick="viewReports('+JSON.stringify(a.id).replace(/"/g,"&quot;")+')">النتائج</button><button style="background:#fde8e8;color:#9f2020" onclick="deleteActivity('+JSON.stringify(a.id).replace(/"/g,"&quot;")+')">حذف</button></div>').join(""):'<p>لا توجد أنشطة منشورة.</p>'}
