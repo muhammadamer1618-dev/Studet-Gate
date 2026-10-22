@@ -1525,6 +1525,9 @@ AlFalah Student Gate
 <h2>الأنشطة التفاعلية</h2>
 </button>
 
+<button class="portal-card" onclick="openStudentLink('english')" type="button"><div class="card-icon">🎧</div><h2>أنشطة اللغة الإنجليزية</h2></button>
+<button class="portal-card" onclick="openStudentLink('teacherNotes')" type="button"><div class="card-icon">📝</div><h2>ملاحظات المعلمين</h2></button>
+
 <button class="portal-card guidance-card" onclick="openStudentLink('guidance')" type="button">
 <div class="card-icon">🧭</div>
 <h2>التوجيه الطلابي</h2>
@@ -1585,12 +1588,14 @@ const studentLinks = {
   activities:"parent-activities.html?v=20261012-7",
   interactive:"interactive-student.html?v=20261013-2",
   guidance:"parent-guidance.html?v=20261012-7",
+  teacherNotes:"teacher-notes.html?v=20261022-1",
+  english:"https://rasededu.online/rased/english-activities.html",
   liveClasses:"student-live-classes.html?v=20261012-7"
 };
 
 function openStudentLink(type){
   const url = studentLinks[type];
-  if(url) window.location.href = url;
+  if(url){const session=window.RasedStudentSSO?.getSession?.();const code=session?.code||session?.loginCode||"";if(type==="english"&&code){const link=new URL(url,location.href);link.searchParams.set("studentCode",code);window.location.href=link.href;}else window.location.href=url;}
 }
 </script>
 
