@@ -31,7 +31,7 @@ function allowedAssignment(a){return a&&a.subjectId&&a.grade&&a.section}
 function teacherAssignments(){return (currentTeacher?.assignments||[]).filter(allowedAssignment).filter(a=>/english|إنجليزي|اللغة الإنجليزية/i.test(a.subjectName||a.subject||a.name||a.subjectId||""))}
 function selectOptions(){const ass=teacherAssignments(),subs=[...new Map(ass.map(a=>[String(a.subjectId),a.subjectName||a.subjectId])).entries()];$("subject").innerHTML=subs.map(([id,name])=>'<option value="'+esc(id)+'">'+esc(name)+'</option>').join("");updateClasses()}
 function updateClasses(){const ass=teacherAssignments().filter(a=>String(a.subjectId)===$("subject").value);$("classroom").innerHTML=ass.map(a=>'<option value="'+esc(a.grade+'||'+a.section)+'">'+esc(a.grade+' — '+a.section)+'</option>').join("")}
-$("subject").addEventListener("change",updateClasses);
+if($("subject"))$("subject").addEventListener("change",updateClasses);
 const isStudentPortal=()=>new URLSearchParams(location.search).get("portal")==="student";
 
 let accessTeachers=[];
