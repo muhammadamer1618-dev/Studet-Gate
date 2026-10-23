@@ -1,1 +1,41 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>بنوك الأسئلة | مدارس الفلاح</title><style>body{margin:0;background:#f7f6f1;color:#064b3d;font-family:Tahoma,Arial}header{text-align:center;padding:35px 15px;background:#005442;color:white}header img{width:90px;height:90px;object-fit:contain;background:white;border-radius:50%;padding:7px}main{max-width:950px;margin:25px auto;padding:20px}.card{background:white;border:1px solid #d9e6df;border-radius:18px;padding:22px;margin:15px 0;box-shadow:0 5px 22px #0c4e3210}a{color:#086a54}footer{text-align:center;padding:22px;color:#667d72}</style></head><body><header><img src="logo.jpeg" alt="شعار المدرسة"><h1>📚 بنوك الأسئلة</h1><p>مستودع أوراق العمل المخصصة للطالب</p></header><main><a href="index.html">← العودة إلى بوابة الطالب</a><div class="card"><h2>أوراق العمل</h2><p>يتم تجهيز عرض الملفات الخاصة بصفك وشعبتك أو الملفات المخصصة لك بالاسم.</p><p>سيتم تفعيل المعاينة والتحميل بعد استكمال قواعد حماية الملفات في النظام.</p></div></main><footer>تصميم محمد عامر أحمد — راصد 2026</footer></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>بنوك الأسئلة | مدارس الفلاح</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f7f6f1;color:#064b3d;font-family:Tahoma,Arial,sans-serif;line-height:1.7}
+header{text-align:center;padding:35px 15px;background:#005442;color:white}header img{width:90px;height:90px;object-fit:contain;background:white;border-radius:50%;padding:7px}
+main{max-width:1000px;margin:25px auto;padding:18px}.card{background:white;border:1px solid #d9e6df;border-radius:18px;padding:22px;margin:15px 0;box-shadow:0 5px 22px #0c4e3210}
+a{color:#086a54}.muted{color:#61786f}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.sheet{border:1px solid #d8e6de;border-radius:14px;padding:17px;background:#fff}.sheet h3{margin:0 0 6px}
+.pill{display:inline-block;border-radius:30px;background:#eaf5ee;padding:3px 11px;font-size:13px;margin:3px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:13px}.actions a{background:#00644e;color:white;text-decoration:none;padding:8px 15px;border-radius:10px;font-weight:bold}
+.actions a:last-child{background:#f0e5cb;color:#59400c}footer{text-align:center;padding:22px;color:#667d72}
+</style></head><body>
+<header><img src="logo.jpeg" alt="شعار مدارس الفلاح"><h1>📚 بنوك الأسئلة</h1><p>مستودع أوراق العمل المخصصة للطالب</p></header>
+<main><a href="index.html">← العودة إلى بوابة الطالب</a><div class="card"><h2>أوراق العمل</h2><p id="student" class="muted">جارٍ التعرف على بيانات الطالب...</p><div id="status" role="status">جارٍ تحميل أوراق العمل...</div><div id="sheets" class="grid"></div></div></main>
+<footer>تصميم محمد عامر أحمد — راصد 2026</footer>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+const config={apiKey:"AIzaSyAfgSV-6_IMkXncgPWxY69omKfvFtGakgk",authDomain:"results2026-7c0dd.firebaseapp.com",projectId:"results2026-7c0dd",storageBucket:"results2026-7c0dd.firebasestorage.app",messagingSenderId:"241421115694",appId:"1:241421115694:web:96f55fd9fd1d5b18b31abf"};
+if(!firebase.apps.length)firebase.initializeApp(config);
+const $=id=>document.getElementById(id),esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function normalize(x){return String(x??"").trim().replace(/[أإآ]/g,"ا").replace(/\s+/g," ").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d))}
+function session(){try{const s=JSON.parse(localStorage.getItem("rased.student.session.v1")||"null");return s&&s.code&&Number(s.expiresAt)>Date.now()?s:null}catch{return null}}
+async function load(){
+ const st=session();if(!st){$("student").textContent="يلزم تسجيل الدخول من بوابة الطالب أولاً."; $("status").innerHTML='<a href="index.html">العودة لتسجيل الدخول</a>';return}
+ let grade=st.grade,section=st.section;
+ try{
+  // Refresh the student's current class rather than relying solely on cached session details.
+  const db=firebase.firestore();
+  if(st.docId||st.code){const d=await db.collection("students").doc(String(st.docId||st.code)).get();if(d.exists){grade=d.data().grade||grade;section=d.data().section||section}}
+  $("student").textContent="الطالب: "+(st.name||"")+" — الصف: "+grade+" — الشعبة: "+section;
+  if(!grade||!section)throw Error("تعذر تحديد الصف أو الشعبة من بيانات الطالب");
+  const snapshot=await db.collection("questionBankSheets").where("published","==",true).get();
+  const sheets=snapshot.docs.map(d=>({id:d.id,...d.data()})).filter(x=>normalize(x.grade)===normalize(grade)&&normalize(x.section)===normalize(section)&&x.fileUrl);
+  $("status").textContent=sheets.length?"عدد أوراق العمل المتاحة: "+sheets.length:"لا توجد أوراق عمل منشورة لصفك وشعبتك حاليًا.";
+  $("sheets").innerHTML=sheets.map(x=>'<article class="sheet"><h3>'+esc(x.title||"ورقة عمل")+'</h3><span class="pill">'+esc(x.subject||"المادة")+'</span><span class="pill">'+esc(x.grade)+' — '+esc(x.section)+'</span><p class="muted">المعلم: '+esc(x.teacherName||"")+'</p><div class="actions"><a target="_blank" rel="noopener noreferrer" href="'+esc(x.fileUrl)+'">فتح / معاينة</a><a target="_blank" rel="noopener noreferrer" href="'+esc(x.fileUrl)+'" download>تحميل الملف</a></div></article>').join("");
+ }catch(e){$("status").textContent="تعذر تحميل أوراق العمل: "+(e.message||e)+" — تحقق من صلاحيات قراءة بنوك الأسئلة في Firestore."}
+}
+load();
+</script></body></html>
