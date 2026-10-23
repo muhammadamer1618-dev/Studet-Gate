@@ -1605,6 +1605,22 @@ function openStudentLink(type){
 </script>
 
 <script src="rased-student-sso.js?v=20261012-7"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+(async function applyStudentPortalVisibility(){
+ const config={apiKey:"AIzaSyAfgSV-6_IMkXncgPWxY69omKfvFtGakgk",authDomain:"results2026-7c0dd.firebaseapp.com",projectId:"results2026-7c0dd",storageBucket:"results2026-7c0dd.firebasestorage.app",messagingSenderId:"241421115694",appId:"1:241421115694:web:96f55fd9fd1d5b18b31abf"};
+ try{
+  if(!firebase.apps.length)firebase.initializeApp(config);
+  const doc=await firebase.firestore().collection("systemSettings").doc("studentPortalCards").get();
+  const visibility=doc.exists?(doc.data().visibility||{}):{};
+  document.querySelectorAll(".portal-card[onclick]").forEach(card=>{
+   const match=(card.getAttribute("onclick")||"").match(/openStudentLink\('([^']+)'\)/);
+   if(match)card.style.display=visibility[match[1]]===false?"none":"";
+  });
+ }catch(error){console.error("Student portal visibility settings unavailable",error)}
+})();
+</script>
 </body>
 
 </html>
