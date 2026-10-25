@@ -1335,8 +1335,7 @@ html,body{
 }
 
 .portal-grid .portal-card,
-.portal-grid .guidance-card,
-.portal-grid .live-classes-card{
+.portal-grid .guidance-card{
   grid-column:auto !important;
   grid-row:auto !important;
   width:clamp(150px,15.5vw,190px) !important;
@@ -1353,8 +1352,7 @@ html,body{
 }
 
 .portal-grid .portal-card:hover,
-.portal-grid .guidance-card:hover,
-.portal-grid .live-classes-card:hover{
+.portal-grid .guidance-card:hover:hover{
   transform:translateY(-7px) scale(1.065) !important;
   z-index:20 !important;
   filter:brightness(1.06) !important;
@@ -1392,8 +1390,7 @@ html,body{
     gap:12px !important;
   }
   .portal-grid .portal-card,
-  .portal-grid .guidance-card,
-  .portal-grid .live-classes-card{
+  .portal-grid .guidance-card{
     width:min(20.5vw,150px) !important;
     height:min(20.5vw,150px) !important;
   }
@@ -1410,8 +1407,7 @@ html,body{
     margin:14px auto 16px !important;
   }
   .portal-grid .portal-card,
-  .portal-grid .guidance-card,
-  .portal-grid .live-classes-card{
+  .portal-grid .guidance-card{
     width:min(22.5vw,92px) !important;
     height:min(22.5vw,92px) !important;
     min-height:74px !important;
@@ -1537,11 +1533,6 @@ AlFalah Student Gate
 <h2>التوجيه الطلابي</h2>
 </button>
 
-<button class="portal-card live-classes-card" onclick="openStudentLink('liveClasses')" type="button">
-<div class="card-icon">💻</div>
-<h2>الحصص المباشرة</h2>
-</button>
-
 </section>
 
 
@@ -1595,7 +1586,7 @@ const studentLinks = {
   teacherNotes:"teacher-notes.html?v=20261022-1",
   english:"english-practice.html?v=20261022-2",
   questionBanks:"question-banks.html?v=20261023-1",
-  liveClasses:"student-live-classes.html?v=20261012-7"
+
 };
 
 function openStudentLink(type){
