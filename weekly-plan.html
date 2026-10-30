@@ -4187,24 +4187,25 @@ loadPlans()
 
 );
 
+/* Student SSO: this is a module; searchStudent is local to this module, not window. */
+(function resumeWeeklyPlanFromPortal(){
+ try{
+  const raw=localStorage.getItem("rased.student.session.v1");
+  const session=raw?JSON.parse(raw):null;
+  if(!session||Number(session.expiresAt)<=Date.now()||!session.expiresAt)return;
+  const identity=String(session.loginCode||session.code||session.docId||"").trim();
+  if(!identity)return;
+  identityInput.value=identity;
+  identityInput.dispatchEvent(new Event("input",{bubbles:true}));
+  Promise.resolve(searchStudent()).catch(error=>console.error("[Weekly plan auto-open]",error));
+ }catch(error){console.error("[Weekly plan SSO]",error)}
+})();
+
 </script>
 
 <script src="rased-student-sso.js?v=20261031-back2"></script>
 
-<script>
-(function resumeWeeklyPlanSession(){
- const session=window.RasedStudentSSO?.getSession?.();
- if(!session)return;
- const input=document.getElementById("identityInput");
- if(!input||typeof window.searchStudent!=="function")return;
- const identity=String(session.loginCode||session.code||session.docId||"").trim();
- if(!identity)return;
- input.value=identity;
- input.dispatchEvent(new Event("input",{bubbles:true}));
- // searchStudent waits for published plans and loads the matching student automatically.
- Promise.resolve(window.searchStudent()).catch(error=>console.error("[Weekly Plan SSO]",error));
-})();
-</script>
+
 
 </body>
 </html>
