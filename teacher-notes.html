@@ -10,5 +10,6 @@ const list=notes.docs.map(d=>d.data()).filter(n=>String(n.kind||"").includes("س
 $("status").textContent=list.length?"عدد الملاحظات: "+list.length:"لا توجد ملاحظات سلوكية مسجلة حاليًا.";
 $("notes").innerHTML=list.map(n=>'<article class="note"><div class="grid"><strong>'+esc(n.category||n.kind||"ملاحظة")+'</strong><span class="date">'+esc(n.date||"")+'</span></div>'+(n.subjectName?'<p>المادة: '+esc(n.subjectName)+'</p>':'')+(n.details?'<p class="details">'+esc(n.details)+'</p>':'')+'<small>المعلم: '+esc(n.teacherName||"")+'</small></article>').join("");
 }catch(e){$("status").textContent="تعذر تحميل الملاحظات: "+e.message}}
-</script><script src="rased-student-sso.js?v=20261012-7"></script><script>window.addEventListener("load",loadNotes);</script><script src="rased-maintenance.js"></script>
+</script><script src="rased-student-sso.js?v=20261012-7"></script><script>window.addEventListener("load",loadNotes);</script>
+<script src="rased-maintenance.js"></script>
 </body></html>
