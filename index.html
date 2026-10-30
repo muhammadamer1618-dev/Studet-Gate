@@ -1545,7 +1545,7 @@ body{background:#f6f8f4!important}
 @media(max-height:440px){.portal-card .card-icon{display:none!important}.portal-grid .portal-card h2{font-size:11px!important}.top .logo{display:none!important}}
 
 </style>
-</head>
+<style id="studentVisibilityAuthorityFix">html.student-visibility-pending .portal-grid .portal-card{visibility:hidden!important}.portal-grid .portal-card[aria-hidden="true"]{display:none!important}</style><script>document.documentElement.classList.add("student-visibility-pending")</script></head>
 
 <body>
 
@@ -1695,17 +1695,31 @@ function openStudentLink(type){
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
-(async function applyStudentPortalVisibility(){
+(function applyStudentPortalVisibility(){
  const config={apiKey:"AIzaSyAfgSV-6_IMkXncgPWxY69omKfvFtGakgk",authDomain:"results2026-7c0dd.firebaseapp.com",projectId:"results2026-7c0dd",storageBucket:"results2026-7c0dd.firebasestorage.app",messagingSenderId:"241421115694",appId:"1:241421115694:web:96f55fd9fd1d5b18b31abf"};
- try{
-  if(!firebase.apps.length)firebase.initializeApp(config);
-  const doc=await firebase.firestore().collection("systemSettings").doc("studentPortalCards").get();
-  const visibility=doc.exists?(doc.data().visibility||{}):{};
-  document.querySelectorAll(".portal-card[onclick]").forEach(card=>{
-   const match=(card.getAttribute("onclick")||"").match(/openStudentLink\('([^']+)'\)/);
-   if(match)card.style.display=visibility[match[1]]===false?"none":"";
+ const cards=Array.from(document.querySelectorAll(".portal-card[onclick]"));
+ function apply(flags){
+  cards.forEach(card=>{
+   const match=(card.getAttribute("onclick")||"").match(/openStudentLink\\('([^']+)'\\)/);
+   if(!match)return;
+   if(flags[match[1]]===false){
+    card.style.setProperty("display","none","important");
+    card.setAttribute("aria-hidden","true");
+   }else{
+    card.style.removeProperty("display");
+    card.removeAttribute("aria-hidden");
+   }
   });
- }catch(error){console.error("Student portal visibility settings unavailable",error)}
+  document.documentElement.classList.remove("student-visibility-pending");
+ }
+ try{
+  if(!window.firebase||!firebase.firestore)throw Error("Firebase is unavailable");
+  if(!firebase.apps.length)firebase.initializeApp(config);
+  firebase.firestore().collection("systemSettings").doc("studentPortalCards").onSnapshot(
+   doc=>apply(doc.exists?(doc.data().visibility||{}):{}),
+   error=>{console.error("Student portal visibility settings unavailable",error);document.documentElement.classList.remove("student-visibility-pending")}
+  );
+ }catch(error){console.error("Student portal visibility initialization failed",error);document.documentElement.classList.remove("student-visibility-pending")}
 })();
 </script>
 
