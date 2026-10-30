@@ -37,8 +37,17 @@ var adapters=[
   {re:/\/Weekly-Plan\/student\.html$/i,input:"identityInput",fn:"searchStudent"}
 ];
 function resume(){var ss=touch();if(!ss)return;var a=adapters.find(function(x){return x.re.test(location.pathname)});if(!a)return;var input=document.getElementById(a.input),fn=window[a.fn];if(!input||typeof fn!=="function")return;input.value=ss.loginCode||ss.code;input.dispatchEvent(new Event("input",{bubbles:true}));input.dispatchEvent(new Event("change",{bubbles:true}));Promise.resolve().then(function(){return fn()}).catch(function(e){console.error("[Rased SSO]",e)});showChip()}
+function showPortalBack(){
+ if(isPortal()||document.getElementById("rasedPortalBackLink"))return;
+ addStyle();
+ var style=document.createElement("style");style.id="rasedStudentBackStyle";
+ style.textContent="#rasedPortalBackLink{position:fixed;bottom:max(16px,env(safe-area-inset-bottom));right:max(16px,env(safe-area-inset-right));z-index:9998;display:inline-flex;align-items:center;justify-content:center;gap:7px;border:2px solid #d7ae50;border-radius:14px;background:linear-gradient(135deg,#005f4e,#003f35);color:#fff;text-decoration:none;padding:12px 18px;font:800 14px Tajawal,Tahoma,Arial,sans-serif;box-shadow:0 7px 24px rgba(0,45,36,.24);max-width:calc(100vw - 28px);white-space:nowrap}#rasedPortalBackLink:hover,#rasedPortalBackLink:focus-visible{background:#087761;outline:2px solid #f1d78b;outline-offset:2px}@media(max-width:600px){#rasedPortalBackLink{bottom:max(12px,env(safe-area-inset-bottom));right:12px;padding:10px 12px;font-size:12px}}@media print{#rasedPortalBackLink{display:none!important}}";
+ document.head.appendChild(style);
+ var a=document.createElement("a");a.id="rasedPortalBackLink";a.href=PORTAL_URL;a.textContent="↩ العودة لبوابة الطالب";a.setAttribute("aria-label","العودة إلى الصفحة الرئيسية لبوابة الطالب");
+ document.body.appendChild(a);
+}
 function wrapLogout(){if(typeof window.logout==="function"&&!window.logout.__rasedSso){var old=window.logout;var wrapped=function(){clearSession();return old.apply(this,arguments)};wrapped.__rasedSso=true;window.logout=wrapped}}
-function init(){if(isPortal()){protectPortal();if(getSession()){touch();showChip()}else portalLogin()}else{if(getSession()){touch();showChip()}wrapLogout()}}
+function init(){if(isPortal()){protectPortal();if(getSession()){touch();showChip()}else portalLogin()}else{showPortalBack();if(getSession()){touch();showChip()}wrapLogout()}}
 window.RasedStudentSSO={getSession:getSession,saveSession:saveSession,clearSession:clearSession,touch:touch,login:login,findStudent:findStudent,portalUrl:PORTAL_URL};
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){setTimeout(init,0)},{once:true});else setTimeout(init,0);
 })();
