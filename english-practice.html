@@ -204,6 +204,6 @@ async function viewReports(id){const a=activities.find(x=>x.id===id);if(!a||a.te
 (async()=>{try{const raw=localStorage.getItem("rased.student.session.v1");const ss=raw?JSON.parse(raw):null;if(ss&&ss.code&&(!ss.expiresAt||Number(ss.expiresAt)>Date.now())){const p=new URLSearchParams(location.search);if(!p.has("studentCode"))history.replaceState(null,"",location.pathname+"?studentCode="+encodeURIComponent(ss.code))}}catch(e){}await init()})();
 </script>
 
-<script src="rased-student-sso.js?v=20261031-back"></script>
+<script src="rased-student-sso.js?v=20261031-back2"></script>
 <footer style="text-align:center;color:#00604c;font:700 12px Tahoma,Arial;padding:12px 0 72px">تصميم محمد عامر أحمد</footer>
 </body></html>
