@@ -26,10 +26,8 @@
 
   function isBypassed(){
     return window.RASED_MAINTENANCE_BYPASS===true ||
-      role()==="admin" || role()==="superadmin" ||
-      /(?:^|\/)admin\.html$/i.test(String(location.pathname||""));
+      /(?:^|\/)admin(?:-login)?\.html$/i.test(String(location.pathname||""));
   }
-
   function isMaintenanceActive(data,now){
     if(!data || data.enabled!==true)return false;
     if(data.returnAt){
