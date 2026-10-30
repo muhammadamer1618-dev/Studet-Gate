@@ -10,6 +10,7 @@ const list=notes.docs.map(d=>d.data()).filter(n=>String(n.kind||"").includes("س
 $("status").textContent=list.length?"عدد الملاحظات: "+list.length:"لا توجد ملاحظات سلوكية مسجلة حاليًا.";
 $("notes").innerHTML=list.map(n=>'<article class="note"><div class="grid"><strong>'+esc(n.category||n.kind||"ملاحظة")+'</strong><span class="date">'+esc(n.date||"")+'</span></div>'+(n.subjectName?'<p>المادة: '+esc(n.subjectName)+'</p>':'')+(n.details?'<p class="details">'+esc(n.details)+'</p>':'')+'<small>المعلم: '+esc(n.teacherName||"")+'</small></article>').join("");
 }catch(e){$("status").textContent="تعذر تحميل الملاحظات: "+e.message}}
-</script><script src="rased-student-sso.js?v=20261012-7"></script><script>window.addEventListener("load",loadNotes);</script>
+</script><script src="rased-student-sso.js?v=20261031-back2"></script><script>window.addEventListener("load",loadNotes);</script>
 
+<div class="rased-designer-credit" style="text-align:center;font:700 12px Tajawal,Tahoma,Arial,sans-serif;color:#006653;margin:12px auto 84px">تصميم محمد عامر أحمد</div>
 </body></html>
