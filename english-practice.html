@@ -203,5 +203,5 @@ async function saveResult(){if(!selectedActivity)return;const params=new URLSear
 async function viewReports(id){const a=activities.find(x=>x.id===id);if(!a||a.teacherId!==username())return;try{const snap=await db.collection("englishActivityResults").where("activityId","==",id).get();$("reports").classList.remove("hidden");$("reportList").innerHTML='<h3>'+esc(a.title)+'</h3>'+(snap.empty?'<p>No results yet.</p>':snap.docs.map(d=>{const x=d.data();return '<div class="activity">رقم Student: '+esc(x.studentCode)+' — '+esc(x.correct)+' / '+esc(x.total)+' — '+esc(x.percent)+'%</div>'}).join(""));$("reports").scrollIntoView({behavior:"smooth"})}catch(e){status("تعذر تحميل Results: "+e.message,true)}}
 (async()=>{try{const raw=localStorage.getItem("rased.student.session.v1");const ss=raw?JSON.parse(raw):null;if(ss&&ss.code&&(!ss.expiresAt||Number(ss.expiresAt)>Date.now())){const p=new URLSearchParams(location.search);if(!p.has("studentCode"))history.replaceState(null,"",location.pathname+"?studentCode="+encodeURIComponent(ss.code))}}catch(e){}await init()})();
 </script>
-<script src="rased-maintenance.js"></script>
+
 </body></html>
