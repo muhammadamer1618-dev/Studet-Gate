@@ -1700,7 +1700,7 @@ function openStudentLink(type){
  const cards=Array.from(document.querySelectorAll(".portal-card[onclick]"));
  function apply(flags){
   cards.forEach(card=>{
-   const match=(card.getAttribute("onclick")||"").match(/openStudentLink\\('([^']+)'\\)/);
+   const match=(card.getAttribute("onclick")||"").match(/openStudentLink\('([^']+)'\)/);
    if(!match)return;
    if(flags[match[1]]===false){
     card.style.setProperty("display","none","important");
