@@ -2134,7 +2134,7 @@ async function findStudent(identity){
     );
 
 
-    if(snapshot.empty && /^\\d+$/.test(identity)){
+    if(snapshot.empty && /^\d+$/.test(identity)){
         const numericCode=Number(identity);
         if(Number.isSafeInteger(numericCode)){
             const numericSnap=await getDocs(query(collection(rasedDb,"students"),where("code","==",numericCode),limit(1)));
@@ -4204,6 +4204,7 @@ loadPlans()
  // searchStudent waits for published plans and loads the matching student automatically.
  Promise.resolve(window.searchStudent()).catch(error=>console.error("[Weekly Plan SSO]",error));
 })();
+</script>
 
 </body>
 </html>
