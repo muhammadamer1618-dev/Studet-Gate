@@ -115,7 +115,7 @@ async function loadParentActivities(code){
   if(!grade||!section)throw Error("بيانات Grade & Section غير مكتملة في حساب الطالب");
   const snap=await db.collection("englishActivities").where("published","==",true).get();
   const norm=v=>String(v??"").trim().replace(/[أإآ]/g,"ا").replace(/\s+/g," ").toLowerCase();
-  const list=snap.docs.map(x=>({id:x.id,...x.data()})).filter(x=>norm(x.grade)===norm(grade)&&norm(x.section)===norm(section));
+  const list=snap.docs.map(x=>({id:x.id,...x.data()})).filter(x=>(Array.isArray(x.targetClasses)&&x.targetClasses.length?x.targetClasses.some(c=>norm(c.grade)===norm(grade)&&norm(c.section)===norm(section)):norm(x.grade)===norm(grade)&&norm(x.section)===norm(section)));
   $("parentActivities").classList.remove("hidden");
   $("parentStudentLabel").textContent="Student: "+(studentData.name||session?.name||"")+" — "+grade+" / "+section;
   $("parentActivityList").innerHTML=list.length?list.map(x=>'<div class="activity"><strong>'+esc(x.title)+'</strong><div class="muted">'+esc(x.subjectName||"اللغة الإنجليزية")+' · '+(x.items||[]).length+' words and sentences</div><button type="button" class="start-english-activity" data-activity-id="'+esc(x.id)+'">Start Activity</button></div>').join(""):"لا توجد أنشطة منشورة لهذا Grade & Section حتى الآن.";
