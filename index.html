@@ -1585,6 +1585,12 @@ AlFalah Student Gate
 
 <section class="portal-grid">
 
+<button class="portal-card" onclick="openStudentLink('remoteLearning')" type="button">
+<div class="card-icon">🎓</div>
+<h2>التعلّم عن بُعد</h2>
+<p>الدخول إلى الحصص الافتراضية ومتابعة الحضور</p>
+</button>
+
 <button class="portal-card" onclick="openStudentLink('exams')" type="button">
 <div class="card-icon">📝</div>
 <h2>الاختبارات الإلكترونية</h2>
@@ -1682,12 +1688,13 @@ const studentLinks = {
   guidance:"parent-guidance.html?v=20261012-7",
   teacherNotes:"teacher-notes.html?v=20261022-1",
   english:"english-practice.html?v=20261022-2",
-  questionBanks:"question-banks.html?v=20261023-1"
+  questionBanks:"question-banks.html?v=20261023-1",
+  remoteLearning:"https://rasededu.online/rased/remote-learning.html"
 };
 
 function openStudentLink(type){
   const url = studentLinks[type];
-  if(url){const session=window.RasedStudentSSO?.getSession?.();const code=session?.code||session?.loginCode||"";if(type==="english"&&code){const link=new URL(url,location.href);link.searchParams.set("studentCode",code);window.location.href=link.href;}else window.location.href=url;}
+  if(url){const session=window.RasedStudentSSO?.getSession?.();const code=session?.code||session?.loginCode||"";if((type==="english"||type==="remoteLearning")&&code){const link=new URL(url,location.href);link.searchParams.set("studentCode",code);window.location.href=link.href;}else window.location.href=url;}
 }
 </script>
 
