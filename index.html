@@ -1694,7 +1694,22 @@ const studentLinks = {
 
 function openStudentLink(type){
   const url = studentLinks[type];
-  if(url){const session=window.RasedStudentSSO?.getSession?.();const code=session?.code||session?.loginCode||"";if((type==="english"||type==="remoteLearning")&&code){const link=new URL(url,location.href);link.hash="studentCode="+encodeURIComponent(code);window.location.href=link.href;}else window.location.href=url;}
+  if(!url)return;
+  const session=window.RasedStudentSSO?.getSession?.();
+  if(type==="remoteLearning"&&session){
+    const link=new URL(url,location.href);
+    const params=new URLSearchParams();
+    if(session.docId)params.set("studentDocId",session.docId);
+    if(session.code)params.set("studentCode",session.code);
+    if(session.loginCode)params.set("studentLoginCode",session.loginCode);
+    link.hash=params.toString();
+    window.location.href=link.href;
+    return;
+  }
+  if(type==="english"&&session?.code){
+    const link=new URL(url,location.href);link.hash="studentCode="+encodeURIComponent(session.code);window.location.href=link.href;return;
+  }
+  window.location.href=url;
 }
 </script>
 
