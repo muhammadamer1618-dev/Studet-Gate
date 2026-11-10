@@ -103,10 +103,7 @@ async function loadParentActivities(code){
   if(!studentData?.grade||!studentData?.section){
     let student=await db.collection("students").doc(normalized).get();
     if(!student.exists&&session?.docId)student=await db.collection("students").doc(session.docId).get();
-    if(!student.exists){
-      const byCode=await db.collection("students").where("code","==",normalized).limit(1).get();
-      if(!byCode.empty)student=byCode.docs[0];
-    }
+    if(!student.exists){const byCode=await db.collection("students").where("code","==",normalized).limit(1).get();if(!byCode.empty)student=byCode.docs[0]}
     if(!student.exists)throw Error("Student record not found");
     studentData=student.data()||{};
   }
@@ -115,10 +112,20 @@ async function loadParentActivities(code){
   if(!grade||!section)throw Error("بيانات Grade & Section غير مكتملة في حساب الطالب");
   const snap=await db.collection("englishActivities").where("published","==",true).get();
   const norm=v=>String(v??"").trim().replace(/[أإآ]/g,"ا").replace(/\s+/g," ").toLowerCase();
-  const list=snap.docs.map(x=>({id:x.id,...x.data()})).filter(x=>(Array.isArray(x.targetClasses)&&x.targetClasses.length?x.targetClasses.some(c=>norm(c.grade)===norm(grade)&&norm(c.section)===norm(section)):norm(x.grade)===norm(grade)&&norm(x.section)===norm(section)));
+  const createdDate=x=>{
+   const v=x.createdAt||x.updatedAt;
+   if(v&&typeof v.toDate==="function")return v.toDate();
+   if(v&&typeof v.toMillis==="function")return new Date(v.toMillis());
+   if(typeof v==="string"||typeof v==="number"){const d=new Date(v);if(Number.isFinite(d.getTime()))return d}
+   return null;
+  };
+  const dateText=x=>{const d=createdDate(x);return d?d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}):"Date unavailable"};
+  const list=snap.docs.map(x=>({id:x.id,...x.data()}))
+   .filter(x=>(Array.isArray(x.targetClasses)&&x.targetClasses.length?x.targetClasses.some(c=>norm(c.grade)===norm(grade)&&norm(c.section)===norm(section)):norm(x.grade)===norm(grade)&&norm(x.section)===norm(section)))
+   .sort((a,b)=>{const da=createdDate(a),db=createdDate(b);if(!da&&!db)return 0;if(!da)return 1;if(!db)return -1;return da-db});
   $("parentActivities").classList.remove("hidden");
   $("parentStudentLabel").textContent="Student: "+(studentData.name||session?.name||"")+" — "+grade+" / "+section;
-  $("parentActivityList").innerHTML=list.length?list.map(x=>'<div class="activity"><strong>'+esc(x.title)+'</strong><div class="muted">'+esc(x.subjectName||"اللغة الإنجليزية")+' · '+(x.items||[]).length+' words and sentences</div><button type="button" class="start-english-activity" data-activity-id="'+esc(x.id)+'">Start Activity</button></div>').join(""):"لا توجد أنشطة منشورة لهذا Grade & Section حتى الآن.";
+  $("parentActivityList").innerHTML=list.length?list.map(x=>'<div class="activity"><strong>'+esc(x.title)+'</strong><div class="muted">📅 '+esc(dateText(x))+' · '+esc(x.subjectName||"اللغة الإنجليزية")+' · '+(x.items||[]).length+' words and sentences</div><button type="button" class="start-english-activity" data-activity-id="'+esc(x.id)+'">Start Activity</button></div>').join(""):"لا توجد أنشطة منشورة لهذا Grade & Section حتى الآن.";
   $("learner").classList.add("hidden");
   status("");
  }catch(e){$("learner").classList.add("hidden");status("Unable to load activities: "+e.message,true)}
