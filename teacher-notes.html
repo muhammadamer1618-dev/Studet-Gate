@@ -31,6 +31,16 @@ main{width:min(100% - 32px,1000px);margin:28px auto 55px}
 .empty{background:#fff;border:1px dashed #bfd4c7;border-radius:18px;padding:35px 20px;text-align:center;color:var(--muted)}.empty .symbol{font-size:36px;margin-bottom:8px}.empty strong{display:block;color:var(--green);font-size:18px;margin-bottom:5px}
 footer{text-align:center;color:#71877b;font-size:12px;font-weight:700;padding:22px 10px 30px}
 @media(max-width:640px){.topbar{padding:15px}.top-inner{align-items:flex-start;flex-direction:column}.brand img{width:52px;height:52px}.back{align-self:stretch}.student-panel{align-items:flex-start;flex-direction:column}.student-grade{margin-right:66px}.summary{gap:9px}.stat{padding:14px}.note{padding:16px}.note-top{flex-direction:column;gap:7px}.note-date{align-self:flex-start}.section-head{align-items:flex-start;flex-direction:column}}
+[hidden]{display:none!important}
+.notes-summary{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin-top:24px;box-shadow:var(--shadow)}
+.notes-summary h3{margin:0 0 12px;color:var(--green);font-size:21px;font-weight:900}
+.notes-summary-meta{display:flex;flex-wrap:wrap;gap:10px 22px;margin-bottom:14px;color:var(--green);font-size:15px;font-weight:800}
+.notes-frequency{width:100%;border-collapse:collapse;table-layout:fixed;font-size:15px}
+.notes-frequency th,.notes-frequency td{padding:12px;border-bottom:1px solid var(--line);text-align:right;overflow-wrap:anywhere}
+.notes-frequency th{background:var(--soft);color:var(--green);font-weight:900}
+.notes-frequency th:last-child,.notes-frequency td:last-child{width:100px;text-align:center;font-weight:900;color:var(--green)}
+.notes-summary p{margin:13px 0 0;color:var(--muted);font-size:13px;line-height:1.8}
+@media(max-width:640px){.notes-summary{padding:16px}.notes-frequency th,.notes-frequency td{padding:10px}.notes-frequency th:last-child,.notes-frequency td:last-child{width:85px}}
 </style>
 </head>
 <body>
@@ -41,13 +51,28 @@ footer{text-align:center;color:#71877b;font-size:12px;font-weight:700;padding:22
 <section class="summary"><div class="stat"><span>إجمالي الملاحظات المسجلة</span><strong id="totalNotes">—</strong></div><div class="stat"><span>آخر ملاحظة مسجلة</span><strong id="lastNote" style="font-size:17px">—</strong></div></section>
 <div class="section-head"><h3>سجل الملاحظات</h3><span>مرتبة من الأحدث إلى الأقدم</span></div>
 <div id="status" role="status">جاري تحميل البيانات...</div><div id="notes" class="notes-list"></div>
+<section id="notesSummary" class="notes-summary" aria-labelledby="notesSummaryTitle" hidden></section>
 </main>
 <footer>مدارس الفلاح الأهلية · بوابة الطالب وولي الأمر<br>تصميم محمد عامر أحمد</footer>
 <script>
 const firebaseConfig={apiKey:"AIzaSyAfgSV-6_IMkXncgPWxY69omKfvFtGakgk",authDomain:"results2026-7c0dd.firebaseapp.com",projectId:"results2026-7c0dd",storageBucket:"results2026-7c0dd.firebasestorage.app",messagingSenderId:"241421115694",appId:"1:241421115694:web:96f55fd9fd1d5b18b31abf"};
 firebase.initializeApp(firebaseConfig);const db=firebase.firestore(),$=id=>document.getElementById(id);
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-async function loadNotes(){try{const session=window.RasedStudentSSO?.getSession?.();if(!session||!session.code){$("status").textContent="سجّل الدخول من البوابة الرئيسية أولًا.";return}
+function renderNotesSummary(notes){
+ const summary=$("notesSummary");
+ if(!notes.length){summary.innerHTML="";summary.hidden=true;return;}
+ const counts=new Map();
+ notes.forEach(note=>{
+  const type=String(note.category||"").trim().replace(/\s+/g," ")||String(note.kind||"").trim().replace(/\s+/g," ")||"ملاحظة غير مصنفة";
+  counts.set(type,(counts.get(type)||0)+1);
+ });
+ const types=[...counts].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],"ar"));
+ summary.innerHTML='<h3 id="notesSummaryTitle">ملخص الملاحظات حسب النوع</h3><div class="notes-summary-meta"><strong>إجمالي الملاحظات: '+notes.length+'</strong><span>عدد الأنواع: '+types.length+'</span></div><table class="notes-frequency"><thead><tr><th scope="col">نوع الملاحظة</th><th scope="col">عدد المرات</th></tr></thead><tbody>'+types.map(([type,count])=>'<tr><td>'+esc(type)+'</td><td>'+count+'</td></tr>').join("")+'</tbody></table><p>الملخص محسوب من الملاحظات المعروضة أعلاه، مرتّبًا من الأكثر تكرارًا.</p>';
+ summary.hidden=false;
+}
+async function loadNotes(){
+ $("notesSummary").hidden=true;$("notesSummary").innerHTML="";
+ try{const session=window.RasedStudentSSO?.getSession?.();if(!session||!session.code){$("status").textContent="سجّل الدخول من البوابة الرئيسية أولًا.";return}
 const code=String(session.code);const [setting,student,notes]=await Promise.all([db.collection("parentDisplaySettings").doc("teacherNotes").get(),db.collection("students").doc(code).get(),db.collection("studentFollowupEvents").where("studentCode","==",code).get()]);
 if(!student.exists){$("status").textContent="تعذر العثور على الطالب المسجل.";return}
 const sd=student.data();$("studentName").textContent=sd.name||"—";$("studentGrade").textContent=[sd.grade,sd.section].filter(Boolean).join(" / ")||"بيانات الطالب";
@@ -57,6 +82,7 @@ $("totalNotes").textContent=list.length;$("lastNote").textContent=list.length?(l
 $("status").textContent=list.length?"تم تحميل "+list.length+" ملاحظات سلوكية مسجلة.":"لا توجد ملاحظات سلوكية مسجلة حاليًا.";
 if(!list.length){$("notes").innerHTML='<div class="empty"><div class="symbol">✓</div><strong>لا توجد ملاحظات مسجلة</strong><span>استمر في التميز والالتزام، أحسنت!</span></div>';return}
 $("notes").innerHTML=list.map(n=>'<article class="note"><div class="note-top"><div class="note-title">'+esc(n.category||n.kind||"ملاحظة سلوكية")+'</div><span class="note-date">📅 '+esc(n.date||"—")+'</span></div><div class="meta">'+(n.subjectName?'<span class="meta-item">📚 المادة: <b>'+esc(n.subjectName)+'</b></span>':'')+'<span class="meta-item">👨‍🏫 المعلم: <b>'+esc(n.teacherName||"غير محدد")+'</b></span></div>'+(n.details?'<div class="details">'+esc(n.details)+'</div>':'')+'</article>').join("");
+renderNotesSummary(list);
 }catch(e){$("status").textContent="تعذر تحميل الملاحظات: "+e.message}}
 </script>
 <script src="rased-student-sso.js?v=20261111-notes-design"></script>
