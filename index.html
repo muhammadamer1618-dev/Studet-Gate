@@ -1545,7 +1545,8 @@ body{background:#f6f8f4!important}
 @media(max-height:440px){.portal-card .card-icon{display:none!important}.portal-grid .portal-card h2{font-size:11px!important}.top .logo{display:none!important}}
 
 </style>
-<style id="studentVisibilityAuthorityFix">html.student-visibility-pending .portal-grid .portal-card{visibility:hidden!important}.portal-grid .portal-card[aria-hidden="true"]{display:none!important}</style><script>document.documentElement.classList.add("student-visibility-pending")</script></head>
+<style id="studentVisibilityAuthorityFix">html.student-visibility-pending .portal-grid .portal-card{visibility:hidden!important}.portal-grid .portal-card[aria-hidden="true"]{display:none!important}</style><script>document.documentElement.classList.add("student-visibility-pending")</script><style id="virtualLabCardLayout">.portal-grid{grid-template-rows:repeat(4,minmax(0,1fr))!important}.portal-card-virtual-lab{grid-column:1/-1}@media(max-width:660px){.portal-grid{grid-template-rows:repeat(5,minmax(0,1fr))!important}}</style>
+</head>
 
 <body>
 
@@ -1636,6 +1637,8 @@ AlFalah Student Gate
 <h2>التوجيه الطلابي</h2>
 </button>
 
+<button class="portal-card portal-card-virtual-lab" onclick="openStudentLink('virtualLab')" type="button"><div class="card-icon">🧪</div><h2>المعمل الافتراضي</h2></button>
+
 </section>
 
 
@@ -1689,7 +1692,8 @@ const studentLinks = {
   teacherNotes:"teacher-notes.html?v=20261126-notes-summary-1",
   english:"english-practice.html?v=20261022-2",
   questionBanks:"question-banks.html?v=20261023-1",
-  remoteLearning:"https://rasededu.online/rased/remote-learning.html"
+  remoteLearning:"https://rasededu.online/rased/remote-learning.html",
+  virtualLab:"https://vlaby.com/ar/login"
 };
 
 function openStudentLink(type){
