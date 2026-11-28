@@ -1772,19 +1772,21 @@ function openStudentLink(type){
   <div class="vl-head"><h2 id="vlTitle">🧪 المعمل الافتراضي</h2><button type="button" id="vlClose" aria-label="إغلاق">✕</button></div>
   <p id="vlWelcome">مرحبًا بك في المعمل الافتراضي VLaby.</p>
   <label for="vlUsername">اسم المستخدم</label>
-  <div class="vl-field"><input id="vlUsername" readonly dir="ltr" placeholder="غير متاح حاليًا" autocomplete="off"><button type="button" id="vlCopyUser" disabled>نسخ</button></div>
+  <div class="vl-field"><input id="vlUsername" dir="ltr" placeholder="أدخل اسم المستخدم" autocomplete="off" autocapitalize="none" spellcheck="false"><button type="button" id="vlCopyUser" disabled>نسخ</button></div>
   <label for="vlPassword">كلمة المرور</label>
-  <div class="vl-field"><input id="vlPassword" type="password" readonly dir="ltr" placeholder="غير متاحة حاليًا" autocomplete="off"><button type="button" id="vlShow" disabled aria-label="إظهار كلمة المرور">إظهار</button><button type="button" id="vlCopyPass" disabled>نسخ</button></div>
-  <p id="vlStatus" class="vl-status" role="status" aria-live="polite">بيانات الحساب غير متاحة في البوابة حاليًا. يمكنك فتح المعمل واستخدام الحساب الذي سلمته لك المدرسة.</p>
-  <a class="vl-link" href="https://vlaby.com/ar/login" target="_blank" rel="noopener noreferrer">فتح موقع المعمل الافتراضي ↗</a>
+  <div class="vl-field"><input id="vlPassword" type="password" dir="ltr" placeholder="أدخل كلمة المرور" autocomplete="off"><button type="button" id="vlShow" aria-label="إظهار كلمة المرور">إظهار</button><button type="button" id="vlCopyPass" disabled>نسخ</button></div>
+  <p id="vlStatus" class="vl-status" role="status" aria-live="polite">أدخل بيانات حسابك التي وصلتك من المدرسة، ثم انسخها والصقها في صفحة تسجيل الدخول إلى VLaby. لا تُحفظ البيانات في راصد.</p>
+  <a class="vl-link" href="https://vlaby.com/ar/login" target="_blank" rel="noopener noreferrer">الانتقال إلى تسجيل الدخول في المعمل ↗</a>
 </dialog>
 <script>
 (function(){
   const dialog=document.getElementById("virtualLabDialog");
   const user=document.getElementById("vlUsername"),pass=document.getElementById("vlPassword");
   const copyUser=document.getElementById("vlCopyUser"),copyPass=document.getElementById("vlCopyPass"),show=document.getElementById("vlShow"),status=document.getElementById("vlStatus");
-  const unavailable="بيانات الحساب غير متاحة في البوابة حاليًا. يمكنك فتح المعمل واستخدام الحساب الذي سلمته لك المدرسة.";
-  function reset(){user.value="";pass.value="";pass.type="password";copyUser.disabled=true;copyPass.disabled=true;show.disabled=true;show.textContent="إظهار";show.setAttribute("aria-label","إظهار كلمة المرور");status.textContent=unavailable;}
+  const unavailable="أدخل بيانات حسابك التي وصلتك من المدرسة، ثم انسخها والصقها في صفحة تسجيل الدخول إلى VLaby. لا تُحفظ البيانات في راصد.";
+  function reset(){user.value="";pass.value="";pass.type="password";copyUser.disabled=true;copyPass.disabled=true;show.disabled=false;show.textContent="إظهار";show.setAttribute("aria-label","إظهار كلمة المرور");status.textContent=unavailable;}
+  function sync(){copyUser.disabled=!user.value.trim();copyPass.disabled=!pass.value;}
+  user.addEventListener("input",sync);pass.addEventListener("input",sync);
   async function copy(field){if(!field.value)return;try{await navigator.clipboard.writeText(field.value);status.textContent="تم النسخ بنجاح.";}catch(e){status.textContent="تعذر النسخ تلقائيًا، يمكنك نسخ النص يدويًا.";}}
   copyUser.addEventListener("click",()=>copy(user));copyPass.addEventListener("click",()=>copy(pass));
   show.addEventListener("click",()=>{const visible=pass.type==="password";pass.type=visible?"text":"password";show.textContent=visible?"إخفاء":"إظهار";show.setAttribute("aria-label",visible?"إخفاء كلمة المرور":"إظهار كلمة المرور");});
@@ -1794,8 +1796,7 @@ function openStudentLink(type){
     reset();
     const session=window.RasedStudentSSO?.getSession?.();
     document.getElementById("vlWelcome").textContent=session?.name?"مرحبًا بك، "+session.name:"مرحبًا بك في المعمل الافتراضي VLaby.";
-    // A local identity/session is not authorization to disclose third-party credentials.
-    // Keep credential fields disabled until a verified server-side authentication and account lookup are deployed.
+    // Credentials are entered locally and never transmitted or persisted by Rased.
     if(!dialog.open)dialog.showModal();
   };
 })();
