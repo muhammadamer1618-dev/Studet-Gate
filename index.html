@@ -1699,7 +1699,6 @@ const studentLinks = {
 function openStudentLink(type){
   const url = studentLinks[type];
   if(!url)return;
-  if(type==="virtualLab"){window.openVirtualLabAccount();return;}
   const session=window.RasedStudentSSO?.getSession?.();
   if(type==="remoteLearning"&&session){
     const link=new URL(url,location.href);
@@ -1752,55 +1751,7 @@ function openStudentLink(type){
 
 <script src="rased-maintenance.js?v=20261031-mobile-refresh2"></script>
 
-<style id="virtualLabAccountStyle">
-#virtualLabDialog{box-sizing:border-box;width:min(92vw,440px);max-height:90dvh;overflow:auto;border:1px solid #dbe8e1;border-radius:22px;padding:24px;color:#173c32;background:#fff;box-shadow:0 24px 80px #102e3855;font-family:inherit;text-align:right;direction:rtl}
-#virtualLabDialog::backdrop{background:#102e38a6}
-#virtualLabDialog *{box-sizing:border-box}
-#virtualLabDialog .vl-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-#virtualLabDialog h2{font-size:22px;margin:0;color:#164d3b}
-#virtualLabDialog p{font-size:14px;line-height:1.7;margin:12px 0}
-#virtualLabDialog label{display:block;font-size:14px;font-weight:700;margin:14px 0 6px}
-#virtualLabDialog .vl-field{display:flex;gap:6px;align-items:stretch}
-#virtualLabDialog input{width:100%;min-width:0;flex:1;border:1px solid #cbdcd3;border-radius:10px;padding:10px;background:#f5f9f7;color:#173c32;font:inherit}
-#virtualLabDialog button,#virtualLabDialog a{font:inherit;border-radius:10px;padding:10px 12px;cursor:pointer}
-#virtualLabDialog button{background:#fff;color:#164d3b;border:1px solid #cbdcd3;white-space:nowrap}
-#virtualLabDialog button:disabled{opacity:.5;cursor:not-allowed}
-#virtualLabDialog .vl-link{display:block;background:#176b50;color:white;text-decoration:none;text-align:center;font-weight:700;margin-top:18px}
-#virtualLabDialog .vl-status{background:#f4f8f5;border-radius:10px;padding:10px;color:#355a48}
-</style>
-<dialog id="virtualLabDialog" aria-labelledby="vlTitle" dir="rtl">
-  <div class="vl-head"><h2 id="vlTitle">🧪 المعمل الافتراضي</h2><button type="button" id="vlClose" aria-label="إغلاق">✕</button></div>
-  <p id="vlWelcome">مرحبًا بك في المعمل الافتراضي VLaby.</p>
-  <label for="vlUsername">اسم المستخدم</label>
-  <div class="vl-field"><input id="vlUsername" dir="ltr" placeholder="أدخل اسم المستخدم" autocomplete="off" autocapitalize="none" spellcheck="false"><button type="button" id="vlCopyUser" disabled>نسخ</button></div>
-  <label for="vlPassword">كلمة المرور</label>
-  <div class="vl-field"><input id="vlPassword" type="password" dir="ltr" placeholder="أدخل كلمة المرور" autocomplete="off"><button type="button" id="vlShow" aria-label="إظهار كلمة المرور">إظهار</button><button type="button" id="vlCopyPass" disabled>نسخ</button></div>
-  <p id="vlStatus" class="vl-status" role="status" aria-live="polite">أدخل بيانات حسابك التي وصلتك من المدرسة، ثم انسخها والصقها في صفحة تسجيل الدخول إلى VLaby. لا تُحفظ البيانات في راصد.</p>
-  <a class="vl-link" href="https://vlaby.com/ar/login" target="_blank" rel="noopener noreferrer">الانتقال إلى تسجيل الدخول في المعمل ↗</a>
-</dialog>
-<script>
-(function(){
-  const dialog=document.getElementById("virtualLabDialog");
-  const user=document.getElementById("vlUsername"),pass=document.getElementById("vlPassword");
-  const copyUser=document.getElementById("vlCopyUser"),copyPass=document.getElementById("vlCopyPass"),show=document.getElementById("vlShow"),status=document.getElementById("vlStatus");
-  const unavailable="أدخل بيانات حسابك التي وصلتك من المدرسة، ثم انسخها والصقها في صفحة تسجيل الدخول إلى VLaby. لا تُحفظ البيانات في راصد.";
-  function reset(){user.value="";pass.value="";pass.type="password";copyUser.disabled=true;copyPass.disabled=true;show.disabled=false;show.textContent="إظهار";show.setAttribute("aria-label","إظهار كلمة المرور");status.textContent=unavailable;}
-  function sync(){copyUser.disabled=!user.value.trim();copyPass.disabled=!pass.value;}
-  user.addEventListener("input",sync);pass.addEventListener("input",sync);
-  async function copy(field){if(!field.value)return;try{await navigator.clipboard.writeText(field.value);status.textContent="تم النسخ بنجاح.";}catch(e){status.textContent="تعذر النسخ تلقائيًا، يمكنك نسخ النص يدويًا.";}}
-  copyUser.addEventListener("click",()=>copy(user));copyPass.addEventListener("click",()=>copy(pass));
-  show.addEventListener("click",()=>{const visible=pass.type==="password";pass.type=visible?"text":"password";show.textContent=visible?"إخفاء":"إظهار";show.setAttribute("aria-label",visible?"إخفاء كلمة المرور":"إظهار كلمة المرور");});
-  document.getElementById("vlClose").addEventListener("click",()=>dialog.close());
-  dialog.addEventListener("close",reset);
-  window.openVirtualLabAccount=function(){
-    reset();
-    const session=window.RasedStudentSSO?.getSession?.();
-    document.getElementById("vlWelcome").textContent=session?.name?"مرحبًا بك، "+session.name:"مرحبًا بك في المعمل الافتراضي VLaby.";
-    // Credentials are entered locally and never transmitted or persisted by Rased.
-    if(!dialog.open)dialog.showModal();
-  };
-})();
-</script>
+
 
 </body>
 
